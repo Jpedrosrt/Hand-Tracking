@@ -9,8 +9,8 @@ class Detector:
         self.md = md
         self.maxh = maxh
         self.mdlcom = mdlcom  # TALVEZ INUTIL
-        self.mindetectco = 0.5
-        self.mintrackco = 0.5
+        self.mindetectco = mindetectco
+        self.mintrackco = mintrackco
 
         self.mp_draw = mp.solutions.drawing_utils
         self.mp_hands = mp.solutions.hands
@@ -44,13 +44,19 @@ class Detector:
                 lmlist.append([num, cx, cy])
 
                 if draw:
-                    cv2.circle(img, (cx, cy), 8, (117, 113, 100), cv2.FILLED)
+                    cv2.circle(img, (cx, cy), 15, (117, 113, 100))
 
         return lmlist
 
 
+# Teste
 def main():
+    # Tamnho da janela da webcam
+    w, h = 400, 400
+
     cam = cv2.VideoCapture(0)  # Escolhendo a webcam 0 do PC
+    cam.set(3, w)
+    cam.set(4, h)
 
     tants = tagr = 0  # Variáveis para o calculo do FPS
 
@@ -61,13 +67,10 @@ def main():
         test, img = cam.read()
 
         # Chamando o método encmaos da class Detector
-        detector.encmaos(img)
+        img = detector.encmaos(img)
 
         # Chamando o método posicao da class Detector
         lmlist = detector.posicao(img)
-
-        if len(lmlist) != 0:
-            print(lmlist[4])
 
         img = cv2.flip(img, 1)  # Espelhando a imagem da webcam
 
