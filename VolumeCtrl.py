@@ -9,7 +9,7 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-w, h = 640, 480
+w, h = 500, 500
 
 cam = cv2.VideoCapture(0)
 cam.set(3, w)
@@ -22,7 +22,7 @@ detector = htm.Detector(mindetectco=0.8)
 # pycaw settings
 devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(
-    IAudioEndpointVolume.iid_, CLSCTX_ALL, None)
+    IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 volume = cast(interface, POINTER(IAudioEndpointVolume))
 
 minv = volume.GetVolumeRange()[0]

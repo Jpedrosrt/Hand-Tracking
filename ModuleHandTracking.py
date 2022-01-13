@@ -8,7 +8,7 @@ class Detector:
         self.resul = None
         self.md = md
         self.maxh = maxh
-        self.mdlcom = mdlcom  # TALVEZ INUTIL
+        self.mdlcom = mdlcom  
         self.mindetectco = mindetectco
         self.mintrackco = mintrackco
 
