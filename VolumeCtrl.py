@@ -2,7 +2,7 @@ import cv2
 import math
 import time
 import numpy as np
-import HandTrackingModule as htm
+import  ModuleHandTracking as htm
 
 # pycaw by AndreMiras https://github.com/AndreMiras/pycaw
 from ctypes import cast, POINTER
