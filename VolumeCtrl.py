@@ -1,15 +1,15 @@
 import cv2
-import math
 import time
 import numpy as np
-import  ModuleHandTracking as htm
+import ModuleHandTracking as htm
 
-# pycaw by AndreMiras https://github.com/AndreMiras/pycaw
+# pycaw
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+#
 
-w, h = 500, 500
+w, h = 640, 480
 
 cam = cv2.VideoCapture(0)
 cam.set(3, w)
@@ -17,58 +17,56 @@ cam.set(4, h)
 
 tants = tagr = 0
 
-detector = htm.Detector(mindetectco=0.8)
+volporc = 0
 
-# pycaw settings
+barvol = 0
+
+detector = htm.Detector(mindetectco=0.8, maxh=1)
+
+# pycaw
 devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(
     IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 volume = cast(interface, POINTER(IAudioEndpointVolume))
-
-minv = volume.GetVolumeRange()[0]
-maxv = volume.GetVolumeRange()[1]
 #
 
 while True:
+
     test, img = cam.read()
 
-    img = detector.encmaos(img)
+    img = cv2.flip(img, 1)
 
-    lmlist = detector.posicao(img, draw=False)
+    img, dire = detector.encmaos(img)
+
+    lmlist, allxy = detector.posicao(img, draw=True)
+
     if len(lmlist) != 0:
 
-        # Pegando a posição da ponta do indicador
-        x1 = lmlist[4][1] 
-        y1 = lmlist[4][2]
+        ddpc = detector.ddspcima()
 
-        # Pegando a posição da ponta do polegar
-        x2 = lmlist[8][1]
-        y2 = lmlist[8][2]
+        # Se todos os dedos estiverem para cima
+        if ddpc == [1, 1, 1, 1, 1]:
+            dist, img, ult = detector.distdd(4, 8, img, draw=True)
 
-        # Pegando o ponto medio da linha entre a (x1, y1) e (x2, y2)
-        mx = (x2 + x1) // 2
-        my = (y2 + y1) // 2
+            # Convertendo os intervalos
+            barvol = np.interp(dist, [0, 160], [400, 150])
+            volporc = np.interp(dist, [0, 160], [0, 100])
 
-        # Desenhando circulos nos pontos e uma linha entre (x1, y1) e (x2, y2)
-        cv2.circle(img, (x1, y1), 8, (117, 113, 100), cv2.FILLED)
-        cv2.circle(img, (x2, y2), 8, (117, 113, 100), cv2.FILLED)
-        cv2.circle(img, (mx, my), 8, (117, 113, 100), cv2.FILLED)
-        cv2.line(img, (x1, y1), (x2, y2), (117, 113, 100), 2)
+            # Deixando mais suave
+            tremilick = 10
+            volporc = tremilick * round(volporc / tremilick)
 
-        # Calculo da distancia entre os pontos (x1, y1) e (x2, y2)
-        dist = math.hypot(x2 - x1, y2 - y1)
-        
-        # Mudando a cor do ponto medio (mx, my) quando (x1, y1) e (x2, y2) ficam próximos 
-        if dist < 15:
-            cv2.circle(img, (mx, my), 8, (117, 0, 100), cv2.FILLED)
+            volume.SetMasterVolumeLevelScalar(volporc / 100, None)
 
-        # Usando numpy para converter o intervalo da distancia (5 - 150) para o intervalo do volume.GetVolumeRange() 
-        vol = np.interp(dist, [5, 150], [minv, maxv])
-
-        # Alterando o volume do computador com base no valor de vol
-        volume.SetMasterVolumeLevel(vol, None)
-
-    img = cv2.flip(img, 1)
+            # Muda o lado da barra de volume dependendo da mão que aparecer 
+            if dire == 'Right':
+                cv2.rectangle(img, (50, 150), (85, 400), (117, 0, 100), 3)
+                cv2.rectangle(img, (50, int(barvol)), (85, 400), (117, 0, 100), cv2.FILLED)
+                cv2.putText(img, f'{volporc} %', (40, 450), cv2.FONT_HERSHEY_COMPLEX, 1, (117, 0, 100), 2)
+            else:
+                cv2.rectangle(img, (590, 150), (555, 400), (117, 0, 100), 3)
+                cv2.rectangle(img, (590, int(barvol)), (555, 400), (117, 0, 100), cv2.FILLED)
+                cv2.putText(img, f'{volporc} %', (500, 450), cv2.FONT_HERSHEY_COMPLEX, 1, (117, 0, 100), 2)
 
     tagr = time.time()
     fps = int(1 / (tagr - tants))
