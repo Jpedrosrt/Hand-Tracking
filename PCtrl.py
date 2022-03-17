@@ -9,6 +9,9 @@ from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 #
 
+#para o controle do mouse
+import pyautogui
+
 w, h = 640, 480
 
 cam = cv2.VideoCapture(0)
