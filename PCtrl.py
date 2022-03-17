@@ -46,6 +46,23 @@ while True:
     if len(lmlist) != 0:
 
         ddpc = detector.ddspcima()
+        
+        
+        if ddpc == [0, 1, 1, 0, 0] or ddpc == [1, 1, 1, 0, 0]:
+            pos = detector.posicao(img)
+            print(pos[0][8])
+            screenWidth, screenHeight = pyautogui.size()
+
+            # if not pyautogui.onScreen(screenWidth, screenHeight):
+            #     ajusx = np.interp(pos[0][8][1], [125, 500], [1, screenWidth - 1])
+            #     ajusy = np.interp(pos[0][8][2], [255, 420], [1, screenHeight - 1])
+                
+            #     tremilick2 = 5
+            #     ajusx = tremilick2 * round(ajusx / tremilick2)
+            #     ajusy = tremilick2 * round(ajusy / tremilick2)
+            #     if ajusx > 0 and ajusy > 0:
+            #         pyautogui.moveTo(ajusx, ajusy)
+
 
         # Se todos os dedos estiverem para cima
         if ddpc == [1, 1, 1, 1, 1]:
